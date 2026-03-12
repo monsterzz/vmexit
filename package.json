@@ -1,0 +1,15 @@
+{
+  "name": "claude-os",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js --open"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "latest",
+    "express": "^4.21.0",
+    "ws": "^8.18.0",
+    "zod": "^4.0.0"
+  }
+}
