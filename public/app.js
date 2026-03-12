@@ -132,8 +132,15 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
+function autoResize() {
+  consoleInput.style.height = "auto";
+  consoleInput.style.height = consoleInput.scrollHeight + "px";
+}
+
+consoleInput.addEventListener("input", autoResize);
+
 consoleInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") {
+  if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     const text = consoleInput.value.trim();
     if (!text || isThinking) return;
@@ -143,20 +150,22 @@ consoleInput.addEventListener("keydown", (e) => {
 
     addMessage("user", text);
     consoleInput.value = "";
+    autoResize();
 
     sendUserMessage(text);
     return;
   }
 
-  if (e.key === "ArrowUp") {
+  if (e.key === "ArrowUp" && consoleInput.selectionStart === 0 && !consoleInput.value.includes("\n")) {
     e.preventDefault();
     if (commandHistory.length === 0) return;
     if (historyIndex > 0) historyIndex--;
     consoleInput.value = commandHistory[historyIndex] || "";
+    autoResize();
     return;
   }
 
-  if (e.key === "ArrowDown") {
+  if (e.key === "ArrowDown" && consoleInput.selectionStart === consoleInput.value.length && !consoleInput.value.includes("\n")) {
     e.preventDefault();
     if (historyIndex < commandHistory.length - 1) {
       historyIndex++;
@@ -165,6 +174,7 @@ consoleInput.addEventListener("keydown", (e) => {
       historyIndex = commandHistory.length;
       consoleInput.value = "";
     }
+    autoResize();
     return;
   }
 });
@@ -313,8 +323,16 @@ function createNewApp() {
   state.apps[appId] = {
     name: "New Application",
     data: {},
-    render: "",
-    styles: "",
+    render: `(data) => \`
+      <div class="welcome">
+        <p class="welcome-slogan">The computer ships empty.<br>What will you build?</p>
+        <p class="welcome-hint">Press <kbd>\\\`</kbd> to open the console</p>
+      </div>
+    \``,
+    styles: `.welcome { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; font-family:var(--font-system); color:var(--text); text-align:center; }
+.welcome-slogan { font-size:1.6rem; font-weight:300; line-height:1.5; margin:0 0 1.2rem; letter-spacing:-0.01em; color:var(--text-bright); }
+.welcome-hint { font-size:0.95rem; color:var(--text-dim); margin:0; }
+.welcome-hint kbd { display:inline-block; padding:2px 8px; border:1px solid var(--border); border-radius:4px; background:var(--bg-surface); font-family:var(--font-mono); font-size:0.9em; color:var(--text); }`,
     handlers: {},
   };
   renderApp(appId);
